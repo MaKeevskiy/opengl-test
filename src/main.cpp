@@ -1,7 +1,25 @@
+#include <iostream>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <iostream>
+int g_WindowSizeX = 640;
+int g_WindowSizeY = 480;
+
+void glfwWindowSizeCallBack(GLFWwindow* pWindow, int width, int height)
+{
+    g_WindowSizeX = width;
+    g_WindowSizeY = height;
+    glViewport(0, 0, g_WindowSizeX, g_WindowSizeY);
+}
+
+void glfwKeyCallBack(GLFWwindow* pWindow, int key, int scancode, int action, int mode)
+{
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+    {
+        glfwSetWindowShouldClose(pWindow, GL_TRUE);
+    }
+}
 
 int main(void)
 {
@@ -11,26 +29,33 @@ int main(void)
     if (!glfwInit())
         return -1;
 
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(g_WindowSizeX, g_WindowSizeY, "opengl-test", nullptr, nullptr);
     if (!window)
     {
         glfwTerminate();
         return -1;
     }
 
+    glfwSetWindowSizeCallback(window, glfwWindowSizeCallBack);
+    glfwSetKeyCallback(window, glfwKeyCallBack);
+
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
     if (!gladLoadGL())
     {
-        std::cout << "Can't load library GLAD!\n";
-        return -1;
+        std::cout << "ERROR: Can't load glad!";
     }
 
-    std::cout << "OpenGL " << GLVersion.major << "." << GLVersion.minor << std::endl;
+    std::cout << "Renderer: " << glGetString(GL_RENDERER) << std::endl;
+    std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
 
-    glClearColor(1, 1, 0, 1);
+    glClearColor(0, 1, 0, 1);
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
